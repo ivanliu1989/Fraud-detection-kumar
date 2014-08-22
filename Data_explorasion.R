@@ -49,3 +49,9 @@ colnames(scoresPs) <- c('Most','Least')
 scoresPs
 sum(as.double(qs[order(qs$x,decreasing=T)[1:100],2]))/sum(as.double(Quant),na.rm=T)*100
 sum(as.double(qs[order(qs$x,decreasing=F)[1:4000],2]))/sum(as.double(Quant),na.rm=T)*100
+
+
+out <- tapply(Uprice,list(Prod=Prod),function(x)length(boxplot.stats(x)$out))
+out[order(out,decreasing = T)[1:10]]
+sum(out)
+sum(out)/nrow(sales)*100

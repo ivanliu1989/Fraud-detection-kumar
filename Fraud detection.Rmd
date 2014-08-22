@@ -71,5 +71,10 @@ colnames(scoresPs) <- c('Most','Least')
 scoresPs
 sum(as.double(qs[order(qs$x,decreasing=T)[1:100],2]))/sum(as.double(Quant),na.rm=T)*100
 sum(as.double(qs[order(qs$x,decreasing=F)[1:4000],2]))/sum(as.double(Quant),na.rm=T)*100
+```
+
+```{r, echo=FALSE, message=F, tidy=TRUE,comment=NA, fig.width=10}
 
 ```
+
+
