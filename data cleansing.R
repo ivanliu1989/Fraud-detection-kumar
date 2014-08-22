@@ -33,4 +33,12 @@ propNAsVp[order(propNAsVp,decreasing = T)[1:10]]
 nnasVs <- tapply(sales$Val,list(sales$ID),function(x)sum(is.na(x)))
 propNAsVs<-nnasVs/table(sales$ID)
 propNAsVs[order(propNAsVs,decreasing = T)[1:10]]
-##178
+
+## Data imputation
+tPrice <- tapply(sales[sales$Insp !='fraud','Uprice'],list(sales[sales$Insp != 'fraud','Prod']),median,na.rm=T)
+noQuant <- which(is.na(sales$Quant))
+sales[noQuant,'Quant'] <- ceiling(sales[noQuant,'Val']/tPrice[sales[noQuant,'Prod']])
+noVal <- which(is.na(sales$Val))
+sales[noVal,'Val']<-sales[noVal,'Quant']*tPrice[sales[noVal,'Prod']]
+sales$Uprice <- sales$Val/sales$Quant
+save(sales,file='salesClean.Rdata')
