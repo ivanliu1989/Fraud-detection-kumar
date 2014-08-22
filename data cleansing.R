@@ -42,3 +42,19 @@ noVal <- which(is.na(sales$Val))
 sales[noVal,'Val']<-sales[noVal,'Quant']*tPrice[sales[noVal,'Prod']]
 sales$Uprice <- sales$Val/sales$Quant
 save(sales,file='salesClean.Rdata')
+
+## Few transactions of some products
+attach(sales)
+notF <- which(Insp != 'fraud')
+ms <- tapply(Uprice[notF],list(Prod=Prod[notF]),function(x){
+    bp <- boxplot.stats(x)$stats
+    c(median=bp[3],iqr=bp[4]-bp[2]) #boxplot.stats() to obtain median, first and third quartiles
+})
+ms <- matrix(unlist(ms),length(ms),2, byrow=T, dimnames=list(names(ms),c('median','iqr')))
+# iqr - inter-quartile range
+head(ms)
+par(mfrow=c(1,2))
+plot(ms[,1],ms[,2],xlab='Median',ylab='IQR',main='')
+plot(ms[,1],ms[,2],xlab='Median',ylab='IQR',main='',col='grey',log='xy')
+smalls <- which(table(Prod)<20)
+points(log(ms[smalls,1]),log(ms[smalls,2]),pch='+')
