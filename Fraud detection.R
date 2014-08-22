@@ -27,7 +27,14 @@ colnames(topP)<-c('Expensive','Cheap')
 topP
 tops <- sales[Prod %in% topP[1,],c('Prod','Uprice')]
 tops$Prod <- factor(tops$Prod)
-par(mfcol = c(1,1))
+par(mfcol = c(1,2))
 boxplot(Uprice~Prod, data=tops,ylab='Uprice',log='y')
 
-vs <- aggregate(Val,list(ID),median,na)
+vs <- aggregate(Val,list(ID),sum,na.rm=T)
+scoresSs <- sapply(c(T,F),function(o)
+    vs[order(vs$x,decreasing=o)[1:5],1])
+colnames(scoresSs)<-c('Most','Least')
+scoresSs
+scores <- sales[ID %in% scoresSs[1,],c('ID','Val')]
+scores$ID <- factor(scores$ID)
+boxplot(Val~ID,data=scores,ylab='Val',log='y')
