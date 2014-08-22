@@ -16,3 +16,18 @@ barplot(totS, main="Transactions per salespeople", name.arg='',
 barplot(totP, main='Transactions per product', names.arg='',
         xlab='Products',ylab='Amount')
 
+sales$Uprice <- sales$Val/sales$Quant
+summary(sales$Uprice)
+
+attach(sales)
+upp <- aggregate(Uprice,list(Prod),median,na.rm=T)
+topP <- sapply(c(T,F),function(o)
+    upp[order(upp[,2],decreasing=o)[1:5],1])
+colnames(topP)<-c('Expensive','Cheap')
+topP
+tops <- sales[Prod %in% topP[1,],c('Prod','Uprice')]
+tops$Prod <- factor(tops$Prod)
+par(mfcol = c(1,1))
+boxplot(Uprice~Prod, data=tops,ylab='Uprice',log='y')
+
+vs <- aggregate(Val,list(ID),median,na)
