@@ -58,3 +58,23 @@ plot(ms[,1],ms[,2],xlab='Median',ylab='IQR',main='')
 plot(ms[,1],ms[,2],xlab='Median',ylab='IQR',main='',col='grey',log='xy')
 smalls <- which(table(Prod)<20)
 points(log(ms[smalls,1]),log(ms[smalls,2]),pch='+')
+
+dms <- scale(ms)
+smalls <- which(table(Prod)<20)
+prods <- tapply(sales$Uprice,sales$Prod,list)
+similar <- matrix(NA,length(smalls),7,dimnames=list(names(smalls),c('Simil','ks.stat','ks.p','medP','iqrP','medS','iqrS')))
+for (i in seq(along=smalls)){
+    d<-scale(dms,dms[smalls[i],],FALSE)
+    d<-sqrt(drop(d^2 %*% rep(1,ncol(d))))
+    stat<-ks.test(prods[[smalls[i]]],prods[[order(d)[2]]])
+    similar[i,]<-c(order(d)[2],stat$statistic,stat$p.value,ms[smalls[i],],ms[order(d)[2],])
+}
+# save similar matrix
+head(similar)
+levels(Prod[similar[1,1]])
+nrow(similar[similar[,'ks.p']>=0.9,])
+sum(similar[,'ks.p']>=0.9)
+save(similar, file='similarProducts.Rdata')
+
+
+
