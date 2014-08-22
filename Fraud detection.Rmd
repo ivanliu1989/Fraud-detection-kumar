@@ -4,4 +4,36 @@ author: "Ivan Liu"
 date: "Friday, August 22, 2014"
 output: html_document
 ---
+<br/>
+#### Data explorasion
+```{r, echo=FALSE, message=F, tidy=TRUE,comment=NA}
+require(DMwR)
+data(sales)
+head(sales, n=5)
+```
+ID - a factor with the ID of the salesman.<br/>
+Prod - a factor indicating the ID of the sold product.<br/>
+Quant - the number of reported sold units of the product.<br/>
+Val - the reported total monetary value of the sale.<br/>
+Insp - a factor with three possible values: ok if the transaction was
+inspected and considered valid by the company, fraud if the transaction
+was found to be fraudulent, and unkn if the transaction was not inspected
+at all by the company.<br/>
 
+```{r, echo=FALSE, message=F, tidy=TRUE,comment=NA}
+summary(sales)
+nlevels(sales$ID)
+nlevels(sales$Prod)
+sum(is.na(sales$Quant)& is.na(sales$Val))
+table(sales$Insp)/nrow(sales)*100
+```
+
+```{r, echo=FALSE, message=F, tidy=TRUE,comment=NA, fig.width=10}
+totS <- table(sales$ID)
+totP <- table(sales$Prod)
+par(mfcol = c(1,2))
+barplot(totS, main="Transactions per salespeople", names.arg='',
+        xlab='Salespeople',ylab='Amount')
+barplot(totP, main='Transactions per product', names.arg='',
+        xlab='Products',ylab='Amount')
+```
