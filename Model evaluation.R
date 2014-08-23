@@ -15,3 +15,17 @@ PRcurve <- function(preds,trues,...){
     plot(pf,...)
 }
 PRcurve(ROCR.simple$predictions, ROCR.simple$labels)
+
+## Lift chart
+pred <- prediction(ROCR.simple$predictions,ROCR.simple$labels)
+perf <- performance(pred,'lift','rpp')
+plot(perf,main='Lift Chart')
+
+## Cumulative recall chart
+CRchart <- function(preds, trues,...){
+    require(ROCR,quietly=T)
+    pd <- prediction(preds,trues)
+    pf <- performance(pd,'rec','rpp')
+    plot(pf,...)
+}
+CRchart(ROCR.simple$predictions, ROCR.simple$labels,main='Cumulative Recall Chart')
