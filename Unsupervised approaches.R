@@ -27,8 +27,14 @@ globalStats[which(globalStats[,'iqr']==0),'iqr']<-globalStats[which(globalStats[
 ## holdOut
 ho.BPrule <- function(form,train,test,...){
     res<-BPrule(train,test)
-    strucutre(evalOutlierRanking(test,res$rankOrder,...),
+    structure(evalOutlierRanking(test,res$rankOrder,...),
               itInfo=list(preds=res$rankScore,trues=ifelse(test$Insp=='fraud',1,0)
                           )
               )
     }
+bp.res <- holdOut(learner('ho.BPrule',
+                          pars=list(Threshold=0.1, statsProds=globalStats)),
+                  dataset(Insp~.,sales),
+                  hldSettings(3,0.3,1234,T),
+                  itsInfo=T)
+summary(bp.res)
