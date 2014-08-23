@@ -49,3 +49,15 @@ avgNDTP <- function(toInsp,train,stats){
     mdtp <- mean(abs(toInsp$Uprice-stats[toInsp$Prod,'median'])/stats[toInsp$Prod,'iqr'])
     return(mdtp)
 }
+
+## evaluation matrix
+evalOutlierRanking <- function(testSet, rankOrder, Threshold, statsProds){
+    ordTS <- testSet[rankOrder,]
+    N <- nrow(testSet)
+    nF<- if(Threshold < 1) as.integer(Threshold*N) else Threshold
+    cm <- table(c(rep('fraud',nF), rep('ok',N-nF)), ordTS$Insp)
+    prec <- cm['fraud','fraud']/sum(cm['fraud',])
+    rec <- cm['fraud','fraud']/sum(cm[,'fraud'])
+    AVGndtp <- avgNDTP(ordTS[nF,],stats=statsProds)
+    return(c(Precision=prec, Recall=rec,avgNdtp=AVGndtp))
+}
