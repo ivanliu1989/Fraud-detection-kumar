@@ -29,3 +29,23 @@ CRchart <- function(preds, trues,...){
     plot(pf,...)
 }
 CRchart(ROCR.simple$predictions, ROCR.simple$labels,main='Cumulative Recall Chart')
+
+## Normalized Distance to Typical Price
+avgNDTP <- function(toInsp,train,stats){
+    if(missing(train)&&missing(stats))
+        stop('Provide either the training data or the product stats')
+    if (missing(stats)){
+        notF <- which(train$Insp != 'fraud')
+        stats <- tapply(train$Uprice[notF],
+                        list(Prod=train$Prod[notF]),
+                        function(x){
+                            bp<-boxplot.stats(x)$stats
+                            c(median=bp[3],iqr=bp[4]-bp[2])
+                        })
+        stats <- matrix(unlist(stats),length(stats),2,byrow=T,
+                        dimnames=list(names(stats),c('median','iqr')))
+        stats[which(stats[,'iqr']==0),'iqr']<- stats[which(stats[,'iqr']==0),'median']
+    }
+    mdtp <- mean(abs(toInsp$Uprice-stats[toInsp$Prod,'median'])/stats[toInsp$Prod,'iqr'])
+    return(mdtp)
+}
