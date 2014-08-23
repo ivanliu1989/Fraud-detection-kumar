@@ -38,3 +38,9 @@ bp.res <- holdOut(learner('ho.BPrule',
                   hldSettings(3,0.3,1234,T),
                   itsInfo=T)
 summary(bp.res)
+
+par(mfrow=c(1,2))
+info <- attr(bp.res,'itsInfo')
+PTs.bp <- aperm(array(unlist(info),dim=c(length(info[[1]]),2,3)),c(1,3,2))
+PRcurve(PTs.bp[,,1],PTs.bp[,,2],main='PR curve',avg='vertical')
+CRchart(PTs.bp[,,1],PTs.bp[,,2],main='Cumulative Recall curve',avg='vertical')
