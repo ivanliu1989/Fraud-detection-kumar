@@ -13,3 +13,22 @@ BPrule <- function(train,test){
     ORscore <- abs(test$Uprice-ms[test$Prod,'median'])/ms[test$Prod,'iqr']
     return(list(rankOrder=order(ORscore,decreasing=T),rankScore=ORscore))
 }
+
+notF <- which(sales$Insp != 'fraud')
+globalStats <- tapply(sales$Uprice[notF],list(Prod=sales$Prod[notF]),
+                      function(x){
+                          bp<-boxplot.stats(x)$stats
+                          c(median=bp[3],iqr=bp[4]-bp[2])
+                      })
+globalStats<-matrix(unlist(globalStats),length(globalStats),2,byrow=T,
+                    dimnames=list(names(globalStats),c('median','iqr')))
+globalStats[which(globalStats[,'iqr']==0),'iqr']<-globalStats[which(globalStats[,'iqr']==0),'median']
+
+## holdOut
+ho.BPrule <- function(form,train,test,...){
+    res<-BPrule(train,test)
+    strucutre(evalOutlierRanking(test,res$rankOrder,...),
+              itInfo=list(preds=res$rankScore,trues=ifelse(test$Insp=='fraud',1,0)
+                          )
+              )
+    }
