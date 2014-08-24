@@ -21,3 +21,26 @@ nbST <- SelfTrain(Species~.,trST,learner('naiveBayes',list()),'func')
 table(predict(nbST,ts),ts$Species)
 
 # implement to our dataset
+pred.nb <- function(m,d){
+    p<-predict(m,d,type='raw')
+    data.frame(cl=colnames(p)[apply(p,1,which.max)],
+               p=apply(p,1,max))
+}
+nb.st <- function(train,test){
+    require(e1071,quietly = T)
+    train <- train[,c('ID','Prod','Uprice','Insp')]
+    train[which(train$Insp=='unkn'),'Insp']<-NA
+    train$Insp <- factor(train$Insp,levels=c('ok','fraud'))
+    model <- SelfTrain(Insp~.,train,learner('naiveBayes',list()),'pred.nb')
+    preds <- predict(model,test[,c('ID','Prod','Uprice','Insp')],type='raw')
+    return(list(rankOrder=order(preds[,'fraud'],decreasing = T),rankScore=preds[,'fraud']))
+}
+ho.nb.st <- function (form, train, test,...){
+    res<-nb.st(train,test)
+    structure(evalOutlierRanking(test,res$rankOrder,...),
+              itInfo=list(preds=res$rankScore,trues=ifelse(test$Insp=='fraud',1,0)))
+}
+nb.st.res <- holdOut(learner('ho.nb.st',pars=list(Threshold=.1,statsProds=globalStats)),
+                     dataset(Insp~.,sales),
+                     hldSettings(3,.3,1234,T),itsInfo=T)
+summary(nb.st.res)
