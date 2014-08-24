@@ -65,3 +65,21 @@ nbs.res <- holdOut(learner('ho.nbs',
                   itsInfo=TRUE)
 
 summary(nbs.res)
+
+png('nb_over_sampling.png')
+par(mfrow=c(1,2))
+info <- attr(nbs.res,'itsInfo')
+PTs.nbs <- aperm(array(unlist(info),dim=c(length(info[[1]]),2,3)),c(1,3,2))
+PRcurve(PTs.nb[,,1],PTs.nb[,,2], main='PR curve',lty=1,xlim=c(0,1),ylim=c(0,1),avg='vertical')
+PRcurve(PTs.nbs[,,1],PTs.nbs[,,2], add=T,lty=2,avg='vertical')
+PRcurve(PTs.orh[,,1],PTs.orh[,,2],
+        add=T,lty=2,col='grey',
+        avg='vertical')
+legend('topright',c('NaiveBayes','smoteNaiveBayes','ORh'),lty=c(1,2,1),col=c('black','black','grey'))
+CRchart(PTs.nb[,,1],PTs.orh[,,2],main='Cumulative Recall curve',lty=1,xlim=c(0,1),ylim=c(0,1),avg='vertical')
+CRchart(PTs.nbs[,,1],PTs.nbs[,,2], add=T,lty=2,avg='vertical')
+CRchart(PTs.orh[,,1],PTs.orh[,,2],
+        add=T,lty=2,col='grey',
+        avg='vertical')
+legend('bottomright',c('NaiveBayes','smoteNaiveBayes','ORh'),lty=c(1,2,1),col=c('black','black','grey'))
+dev.off()
