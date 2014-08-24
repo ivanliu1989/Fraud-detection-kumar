@@ -73,6 +73,52 @@ summary(lof.res)
 
 ## compare two method
 gc()
+png('PR_CR_curves.png')
+par(mfrow=c(1,2))
+info <- attr(lof.res,'itsInfo')
+PTs.lof <- aperm(array(unlist(info),dim=c(length(info[[1]]),2,3)),
+                 c(1,3,2))
+PRcurve(PTs.bp[,,1],PTs.bp[,,2],
+        main='PR curve',lty=1,xlim=c(0,1),ylim=c(0,1),
+        avg='vertical')
+PRcurve(PTs.lof[,,1],PTs.lof[,,2],
+        add=T,lty=2,
+        avg='vertical')
+legend('topright',c('BPrule','LOF'),lty=c(1,2))
+CRchart(PTs.bp[,,1],PTs.bp[,,2],
+        main='Cumulative Recall curve',lty=1,xlim=c(0,1),ylim=c(0,1),
+        avg='vertical')
+CRchart(PTs.lof[,,1],PTs.lof[,,2],
+        add=T,lty=2,
+        avg='vertical')
+legend('bottomright',c('BPrule','LOF'),lty=c(1,2))
+dev.off()
+
+## Clustering-Based Outlier Rankings
+ho.ORh <- function(form,train,test,...){
+    ntr<-nrow(train)
+    all<-rbind(train,test)
+    N<-nrow(all)
+    ups<-split(all$Uprice,all$Prod)
+    r<-list(length=ups)
+    for(u in seq(along=ups))
+        r[[u]]<-if(NROW(ups[[u]])>3)
+            outliers.ranking(ups[[u]])$prob.outliers
+    else if (NROW(ups[[u]])) rep(0,NROW(ups[[u]]))
+    else NULL
+    all$orh <- vector(length=N)
+    split(all$orh,all$Prod)<-r
+    all$orh[which(!(is.infinite(all$orh)|is.nan(all$orh)))]<-
+        SoftMax(all$orh[which(!(is.infinite(all$orh)|is.nan(all$orh)))])
+    structure(evalOutlierRanking(test,order(all[(ntr+1):N,'orh'],trues=ifelse(test$Insp=='fraud',1,0))))
+}
+
+orh.res <- holdOut(learner('ho.ORh',pars=list(Threshold=0.1, statsProds=globalStats)),
+                   dataset(Insp~.,sales),
+                   hldSettings(3,0.3,1234,T),
+                   itsInfo=TRUE)
+summary(orh.res)
+## plot
 par(mfrow=c(1,2))
 info <- attr(lof.res,'itsInfo')
 PTs.lof <- aperm(array(unlist(info),dim=c(length(info[[1]]),2,3)),
