@@ -70,3 +70,24 @@ lof.res <- holdOut(learner('ho.LOF',pars=list(k=7, Threshold=0.1,statsProds=glob
                    hldSettings(3,0.3,1234,T),
                    itsInfo=T)
 summary(lof.res)
+
+## compare two method
+gc()
+par(mfrow=c(1,2))
+info <- attr(lof.res,'itsInfo')
+PTs.lof <- aperm(array(unlist(info),dim=c(length(info[[1]]),2,3)),
+                 c(1,3,2))
+PRcurve(PTs.bp[,,1],PTs.bp[,,2],
+        main='PR curve',lty=1,xlim=c(0,1),ylim=c(0,1),
+        avg='vertical')
+PRcurve(PTs.lof[,,1],PTs.lof[,,2],
+        add=T,lty=2,
+        avg='vertical')
+legend('topright',c('BPrule','LOF'),lty=c(1,2))
+CRchart(PTs.bp[,,1],PTs.bp[,,2],
+        main='Cumulative Recall curve',lty=1,xlim=c(0,1),ylim=c(0,1),
+        avg='vertical')
+CRchart(PTs.lof[,,1],PTs.lof[,,2],
+        add=T,lty=2,
+        avg='vertical')
+legend('bottomright',c('BPrule','LOF'),lty=c(1,2))
