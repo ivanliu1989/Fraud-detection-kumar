@@ -120,8 +120,8 @@ orh.res <- holdOut(learner('ho.ORh',pars=list(Threshold=0.1, statsProds=globalSt
 summary(orh.res)
 ## plot
 par(mfrow=c(1,2))
-info <- attr(lof.res,'itsInfo')
-PTs.lof <- aperm(array(unlist(info),dim=c(length(info[[1]]),2,3)),
+info <- attr(orh.res,'itsInfo')
+PTs.orh <- aperm(array(unlist(info),dim=c(length(info[[1]]),2,3)),
                  c(1,3,2))
 PRcurve(PTs.bp[,,1],PTs.bp[,,2],
         main='PR curve',lty=1,xlim=c(0,1),ylim=c(0,1),
@@ -129,11 +129,18 @@ PRcurve(PTs.bp[,,1],PTs.bp[,,2],
 PRcurve(PTs.lof[,,1],PTs.lof[,,2],
         add=T,lty=2,
         avg='vertical')
-legend('topright',c('BPrule','LOF'),lty=c(1,2))
+PRcurve(PTs.orh[,,1],PTs.orh[,,2],
+        add=T,lty=2,col='grey',
+        avg='vertical')
+legend('topright',c('BPrule','LOF','ORh'),lty=c(1,2,1),col=c('black','black','grey'))
 CRchart(PTs.bp[,,1],PTs.bp[,,2],
         main='Cumulative Recall curve',lty=1,xlim=c(0,1),ylim=c(0,1),
         avg='vertical')
 CRchart(PTs.lof[,,1],PTs.lof[,,2],
         add=T,lty=2,
         avg='vertical')
-legend('bottomright',c('BPrule','LOF'),lty=c(1,2))
+CRchart(PTs.orh[,,1],PTs.orh[,,2],
+        add=T,lty=2,col='grey',
+        avg='vertical')
+legend('bottomright',c('BPrule','LOF','ORh'),lty=c(1,2,1),col=c('black','black','grey'))
+
