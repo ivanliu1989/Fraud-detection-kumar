@@ -20,3 +20,18 @@ nb.res <- holdOut(learner('ho.nb',
                   dataset(Insp~.,sales),
                   hldSettings(3,0.3,1234,T),
                   itsInfo=TRUE)
+
+summary(nb.res)
+par(mfrow=c(1,2))
+info <- attr(nb.res,'itsInfo')
+PTs.nb <- aperm(array(unlist(info),dim=c(length(info[[1]]),2,3)),c(1,3,2))
+PRcurve(PTs.nb[,,1],PTs.nb[,,2], main='PR curve',lty=1,xlim=c(0,1),ylim=c(0,1),avg='vertical')
+PRcurve(PTs.orh[,,1],PTs.orh[,,2],
+        add=T,lty=2,col='grey',
+        avg='vertical')
+legend('topright',c('NaiveBayes','ORh'),lty=1,col=c('black','grey'))
+CRchart(PTs.nb[,,1],PTs.orh[,,2],main='Cumulative Recall curve',lty=1,xlim=c(0,1),ylim=c(0,1),avg='vertical')
+CRchart(PTs.orh[,,1],PTs.orh[,,2],
+        add=T,lty=2,col='grey',
+        avg='vertical')
+legend('bottomright',c('NaiveBayes','ORh'),lty=1,col=c('black','grey'))
