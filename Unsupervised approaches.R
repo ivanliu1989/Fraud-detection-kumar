@@ -65,3 +65,8 @@ ho.LOF <-function(form, train,test,k,...){
               itInfo=list(preds=all[(ntr+1):N,'lof'],
                           trues=ifelse(test$Insp=='fraud',1,0)))
 }
+lof.res <- holdOut(learner('ho.LOF',pars=list(k=7, Threshold=0.1,statsProds=globalStats)),
+                   dataset(Insp~.,sales),
+                   hldSettings(3,0.3,1234,T),
+                   itsInfo=T)
+summary(lof.res)
